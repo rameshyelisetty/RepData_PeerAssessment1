@@ -1,25 +1,214 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "PA1_template"
+author: "Ramesh Yelisetty"
+date: "Sunday, October 18, 2015"
+output: html_document
 ---
 
 
-## Loading and preprocessing the data
+# Loading and preprocessing the data
+
+Show any code that is needed to
+
+1. Load the data (i.e. read.csv())
+
+2. Process/transform the data (if necessary) into a format suitable for your analysis
+
+# What is mean total number of steps taken per day?
+
+For this part of the assignment, you can ignore the missing values in the dataset.
+
+1. Calculate the total number of steps taken per day
+
+2. If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
+
+
+3. Calculate and report the mean and median of the total number of steps taken per day
 
 
 
-## What is mean total number of steps taken per day?
+```{r}
+# 1
+# Loading and preprocessing the data
+
+data0 <- read.csv("activity.csv", header = T, na.strings = "NA")
+
+# Convert to date format
+data0$date <- as.Date(data0$date)
+
+# per day calculations
+# 1. Calculate the total number of steps taken per day
+
+# daily split
+dataByDay <- split(data0, data0$date)
+# Sum of steps per day
+stepsByDayTotal <- sapply(dataByDay, function(x){sum(x$steps, na.rm = T)})
+...
+# Plot 1
+
+```{r, echo=FALSE}
+# 1
+# Plot a histogram
+hist(stepsByDayTotal,
+     col="red",
+     ylim=c(0,30),
+     xlab="Total Steps per Day",
+     main="Total Steps taken per Day")
+...
+...{r}
+# Mean of Total steps per day
+cat("\nMean Steps per Day: ", mean(stepsByDayTotal))
+# Median of Total steps per day
+cat("\nMedian Steps per Day: ", median(stepsByDayTotal))
+```
+
+# What is the average daily activity pattern?
+
+1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
+...{r}
+# Loading and preprocessing the data
 
-## What is the average daily activity pattern?
+data0 <- read.csv("activity.csv", header = T, na.strings = "NA")
+
+# Convert to date format
+data0$date <- as.Date(data0$date)
+
+# 5min split
+dataBy5min <- split(data0, data0$interval)
+# Average of steps per interval
+stepsByIntervalMean <- sapply(dataBy5min, function(x){mean(x$steps, na.rm = T)})
+
+...
 
 
+# Plot 1
 
-## Imputing missing values
+```{r, echo=FALSE}
+# Plot average activity
+# Setup the plot
+
+plot(names(stepsByIntervalMean), stepsByIntervalMean,
+     type = "n",
+     xlab="Interval",
+     ylab="Average steps",
+     main="Average Activity(steps) by Interval")
+
+lines(names(stepsByIntervalMean), stepsByIntervalMean, 
+      type = "l")
+...
+
+...{r}
+
+# Max of Average steps per Interval
+cat("\nMax of Average Steps per Interval: ", max(stepsByIntervalMean))
+# Interval with Max steps
+cat("\nInterval with Max (average) Steps per Day: ", names(stepsByIntervalMean[match(max(stepsByIntervalMean), stepsByIntervalMean)]))
+
+...
+
+# Imputing missing values
+
+Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+
+2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+...{r}
+# Loading and preprocessing the data
+
+data0 <- read.csv("activity.csv", header = T, na.strings = "NA")
+# make a copy to impute
+data1 <- data0
+
+# Impute NA steps with Interval average
+
+# list of intervals
+intervalList <- unique(data1$interval)
 
 
+for(i in intervalList){
+        
+     data1[i==data1$interval,]$steps[is.na(data1[i==data1$interval,]$steps)] = mean(data1[i==data1$interval,]$steps, na.rm=TRUE)
+        
+}
 
-## Are there differences in activity patterns between weekdays and weekends?
+# per day calculations
+# 1. Calculate the total number of steps taken per day
+
+# daily split
+dataByDay <- split(data1, df$date)
+# Sum of steps per day
+stepsByDayTotal <- sapply(dataByDay, function(x){sum(x$steps, na.rm = T)})
+
+
+```{r, echo=FALSE}
+# Plot a histogram
+hist(stepsByDayTotal,
+     col="red",
+     ylim=c(0,30),
+     xlab="Total Steps per Day",
+     main="Total Steps taken per Day")
+...
+
+...{r}
+
+# Mean of Total steps per day
+cat("\nMean Steps per Day: ", mean(stepsByDayTotal))
+# Median of Total steps per day
+cat("\nMedian Steps per Day: ", median(stepsByDayTotal))
+...
+
+# Are there differences in activity patterns between weekdays and weekends?
+
+For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+
+1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+...{r}
+
+# Loading and preprocessing the data
+
+data0 <- read.csv("activity.csv", header = T, na.strings = "NA")
+
+# Convert to date format
+data0$date <- as.Date(data0$date)
+
+# 5min split
+dataBy5min <- split(data0, data0$interval)
+# Average of steps per interval
+stepsByIntervalMean <- sapply(dataBy5min, function(x){mean(x$steps, na.rm = T)})
+# Plot average activity
+
+...{r, echo=FALSE}
+# Setup the plot
+
+plot(names(stepsByIntervalMean), stepsByIntervalMean,
+     type = "n",
+     xlab="Interval",
+     ylab="Average steps",
+     main="Average Activity(steps) by Interval")
+
+lines(names(stepsByIntervalMean), stepsByIntervalMean, 
+     type = "l")
+...
+
+...{r}
+
+# Max of Average steps per Interval
+cat("\nMax of Average Steps per Interval: ", max(stepsByIntervalMean))
+# Interval with Max steps
+cat("\nInterval with Max (average) Steps per Day: ", names(stepsByIntervalMean[match(max(stepsByIntervalMean), stepsByIntervalMean)]))
+
+
+...
